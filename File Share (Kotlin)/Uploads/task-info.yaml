@@ -35,12 +35,9 @@ files:
   - name: src/fileshare/model/UpdatedFilesInfo.kt
     visible: true
     learner_created: true
-  - name: src/fileshare/repository/UploadDirRepository.kt
-    visible: true
-    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/39858#comment
 status: Solved
 feedback:
   message: Congratulations!
-  time: "Sun, 23 Mar 2025 12:09:28 UTC"
-record: -1
+  time: "Sun, 23 Mar 2025 20:48:02 UTC"
+record: 1
