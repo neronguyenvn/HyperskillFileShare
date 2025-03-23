@@ -1,0 +1,18 @@
+<div class="step-text">
+<p></p><h5 id="description">Description</h5><p>Let's start the project by creating two REST API endpoints.</p><p>The first one, <code class="language-json">POST /api/v1/upload</code>, will accept a multipart file with the request parameter named <code class="language-json">file</code>, save the transferred file to the uploads directory, and respond with the status code <code class="language-json">201 CREATED</code>. You can find the path to the uploads directory in the <code class="language-json">application.properties</code> file along with other project settings:</p><pre><code class="language-no-highlight">server.port=8888
+
+management.endpoints.web.exposure.include=*
+management.endpoint.shutdown.enabled=true
+
+uploads.dir=../uploads
+</code></pre><p>You may hardcode this value or, better, inject it using the <code class="language-json">@Value</code> annotation. Make sure your application creates the uploads directory if it doesn't exist.</p><p></p><div class="alert alert-warning"><p>It's crucial to store uploaded files at the path specified in the application.properties files above.</p></div><p></p><p>The second endpoint, <code class="language-json">GET /api/v1/info</code> should respond with the status code <code class="language-json">200 OK</code> and information about the total number of files stored in the uploads directory and their total size in JSON format.</p><h5 id="objectives">Objectives</h5><ul><li><p>Read the <code class="language-json">uploads.dir</code> property from the application.properties file and create the directory at the specified location.</p></li><li><p>Create the <code class="language-json">POST /api/v1/upload</code> endpoint to accept a multipart file transferred with the request parameter <code class="language-json">file</code>. Save the file in the uploads directory under the original name. When the file is successfully saved, the endpoint should respond with the status code <code class="language-json">201 CREATED</code>.</p></li><li><p>Create the <code class="language-json">GET /api/v1/info</code> that should respond with the status code <code class="language-json">200 OK</code> and the following response body in the JSON format:</p><pre><code class="language-json">{
+  "total_files": &lt;total files in the uploads directory&gt;,
+  "total_bytes": &lt;total size of the files in the uploads directory, in bytes&gt;
+}</code></pre><p> Remember that this JSON should reflect the actual number and size of the files currently stored in the uploads directory.</p></li></ul><h5 id="examples">Examples</h5><p><strong>Example 1</strong>. <em>GET request to /api/v1/info before any files have been uploaded:</em></p><p><em>Response code</em>: <code class="language-json">200 OK</code></p><p>Response body:</p><pre><code class="language-json">{
+  "total_files": 0,
+  "total_bytes": 0
+}</code></pre><p><strong>Example 2</strong>. <em>POST request to /api/v1/upload with a multipart file</em>:</p><p><em>Response code</em>: <code class="language-json">201 CREATED</code></p><p><strong>Example 3</strong>. <em>GET request to /api/v1/info after some files have been uploaded:</em></p><p><em>Response code</em>: <code class="language-json">200 OK</code></p><p>Response body:</p><pre><code class="language-json">{
+  "total_files": 3,
+  "total_bytes": 194325
+}</code></pre>
+</div>

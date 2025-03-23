@@ -1,0 +1,40 @@
+type: edu
+files:
+  - name: src/fileshare/web/UploadRestController.kt
+    visible: true
+    learner_created: false
+  - name: src/fileshare/Application.kt
+    visible: true
+    learner_created: false
+  - name: src/resources/application.properties
+    visible: true
+    learner_created: false
+  - name: build.gradle
+    visible: true
+    learner_created: false
+  - name: src/fileshare/model/UpdatedFilesInfo.kt
+    visible: true
+    learner_created: false
+  - name: test/files/file 1.jpg
+    visible: false
+    is_binary: true
+    learner_created: false
+  - name: test/files/file2.jpg
+    visible: false
+    is_binary: true
+    learner_created: false
+  - name: test/files/file3.txt
+    visible: false
+    learner_created: false
+  - name: test/FileClient.java
+    visible: false
+    learner_created: false
+  - name: test/FileData.java
+    visible: false
+    learner_created: false
+  - name: test/FileShareTest.java
+    visible: false
+    learner_created: false
+feedback_link: https://hyperskill.org/learn/step/39860#comment
+status: Unchecked
+record: -1

@@ -1,0 +1,46 @@
+type: edu
+files:
+  - name: src/fileshare/controller/UploadRestController.kt
+    visible: true
+    learner_created: false
+  - name: src/fileshare/Application.kt
+    visible: true
+    learner_created: false
+  - name: src/resources/application.properties
+    visible: true
+    learner_created: false
+  - name: test/files/file 1.jpg
+    visible: false
+    is_binary: true
+    learner_created: false
+  - name: test/files/file2.jpg
+    visible: false
+    is_binary: true
+    learner_created: false
+  - name: test/files/file3.txt
+    visible: false
+    learner_created: false
+  - name: test/FileClient.java
+    visible: false
+    learner_created: false
+  - name: test/FileData.java
+    visible: false
+    learner_created: false
+  - name: test/FileShareTest.java
+    visible: false
+    learner_created: false
+  - name: build.gradle
+    visible: true
+    learner_created: false
+  - name: src/fileshare/model/UpdatedFilesInfo.kt
+    visible: true
+    learner_created: true
+  - name: src/fileshare/repository/UploadDirRepository.kt
+    visible: true
+    learner_created: true
+feedback_link: https://hyperskill.org/learn/step/39858#comment
+status: Solved
+feedback:
+  message: Congratulations!
+  time: "Sun, 23 Mar 2025 12:09:28 UTC"
+record: -1

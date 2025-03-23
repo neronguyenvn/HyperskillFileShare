@@ -1,0 +1,30 @@
+<div class="step-text">
+<h5 id="description">Description</h5>
+<p>Our file-sharing service is doing well, but we have received feedback from users that the free storage space is running out too quickly. Unfortunately, increasing the storage limit is not a viable option due to the high cost involved. Is there any way we can allow users to upload more files without taking up additional disk space?</p>
+<p>You researched how users use the service and discovered that they often save identical files under the same or different file names. For example, Alice can save the <em>report1.txt</em> file and Bob can save the same file under the name <em>alice-report.txt</em>.</p>
+<p>This means there is an opportunity to avoid saving identical files on disk! You can save the <em>report1.txt</em> once, and when Bob uploads <em>alice-report.txt</em>, you can detect that there is a file with the same content and don't save it on disk. The trick is to ensure that when Bob downloads his <em>alice-report.txt</em> file, he gets the file with the correct original name.</p>
+<p>How can we compare the contents of different files? Comparing them byte-by-byte doesn't look like an acceptable solution. What if we use a hashing algorithm, for example, MD5, to calculate the hash of all file bytes and store it in a database? Later, when a new file is uploaded, we can check if we have a file with the same hash.</p>
+<p>Let's do it! The other functionality of the service should remain the same.</p>
+<h5 id="objectives">Objectives</h5>
+<ul>
+<li>Update the <code class="language-json">POST /api/v1/upload</code> endpoint so that when a new valid file is uploaded, unique files are saved on the disk. For example, if the same file <code class="language-json">image.jpg</code> is uploaded ten times under different names, only one file is saved on the disk.</li>
+<li>The <code class="language-json">GET /api/v1/download/{id}</code> endpoint should allow a user to download an uploaded file regardless of whether it was saved on disk or associated with another file.</li>
+<li>The <code class="language-json">GET /api/v1/info</code> endpoint should return information about the actual files stored on disk, not about the number of uploads.</li>
+<li>The storage space limitation should apply to the physical storage. If two identical 50KB files are uploaded, the free space should be reduced by 50 KB.</li>
+<li>Update the free space-checking logic. If the uploaded file size is larger than the available free space, but the file will not be saved on disk, the file should be accepted. The maximum file size limit still applies.</li>
+</ul>
+<h5 id="examples">Examples</h5>
+<p><strong>Example 1</strong>. <em>POST request to <code class="language-json">/api/v1/upload</code> with a multipart file named "file.txt"</em></p>
+<p><em>Response code</em>: <code class="language-json">201 CREATED</code></p>
+<p>Response header: <code class="language-json">Location: http://localhost:8888/api/v1/download/12</code></p>
+<p><strong>Example 2</strong>. <em>GET request to /api/v1/info after the "file.txt" have been uploaded multiple times:</em></p>
+<p><em>Response code</em>: <code class="language-json">200 OK</code></p>
+<p>Response body:</p>
+<pre><code class="language-json">{
+  "total_files": 1,
+  "total_bytes": 2428
+}</code></pre>
+<p><strong>Example 3</strong>. <em>POST request to <code class="language-json">/api/v1/upload</code> with a multipart file identical to the previously uploaded "file.txt", but the free space on the server is not enough</em>:</p>
+<p><em>Response code</em>: <code class="language-json">201 CREATED</code></p>
+<p>Response header: <code class="language-json">Location: http://localhost:8888/api/v1/download/12</code></p>
+</div>

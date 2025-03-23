@@ -1,0 +1,253 @@
+hyperskill_project:
+  id: 415
+  ide_files: https://hyperskill.org/api/projects/415/additional-files/additional_files.json
+  is_template_based: false
+  use_ide: true
+update_date: "Sun, 23 Mar 2025 11:52:59 UTC"
+stages:
+  - id: 2425
+    step: 39858
+    is_completed: true
+  - id: 2426
+    step: 39859
+    is_completed: false
+  - id: 2427
+    step: 39860
+    is_completed: false
+  - id: 2428
+    step: 39861
+    is_completed: false
+  - id: 2429
+    step: 39862
+    is_completed: false
+topics:
+  0:
+    - title: "Write, compile, and run"
+      theory_id: 3739
+    - title: "Basic terms: JVM, JRE, JDK"
+      theory_id: 3499
+    - title: Operating systems
+      theory_id: 9704
+    - title: Command line overview
+      theory_id: 8977
+    - title: Parameters and options
+      theory_id: 9746
+    - title: World Wide Web
+      theory_id: 6633
+    - title: "HTTP: HyperText Transfer Protocol"
+      theory_id: 6569
+    - title: Spring and Spring Boot frameworks
+      theory_id: 7944
+    - title: Getting started with Spring Boot
+      theory_id: 6336
+    - title: Basic project structure
+      theory_id: 6339
+    - title: HTTP URL
+      theory_id: 6740
+    - title: Introduction to Spring Web MVC
+      theory_id: 13611
+    - title: HTTP messages
+      theory_id: 6752
+    - title: REST
+      theory_id: 7834
+    - title: Postman
+      theory_id: 8512
+    - title: Introduction to Kotlin
+      theory_id: 4350
+    - title: "Basic literals: numbers, strings and characters"
+      theory_id: 4351
+    - title: Writing first program
+      theory_id: 4362
+    - title: Values and variables
+      theory_id: 4371
+    - title: Constants and val variables
+      theory_id: 17408
+    - title: Data types
+      theory_id: 4388
+    - title: Comments
+      theory_id: 4406
+    - title: Kotlin style guide. Coding conventions
+      theory_id: 4419
+    - title: Naming variables
+      theory_id: 4389
+    - title: Standard output
+      theory_id: 4425
+    - title: Invoking functions
+      theory_id: 4575
+    - title: Standard input with Java Scanner
+      theory_id: 4445
+    - title: String basics
+      theory_id: 12553
+    - title: String templates
+      theory_id: 4547
+    - title: Boolean type and operations. True and false
+      theory_id: 4515
+    - title: Arithmetic operations
+      theory_id: 4472
+    - title: Increment and decrement
+      theory_id: 10776
+    - title: Build tools
+      theory_id: 4284
+    - title: JAR files
+      theory_id: 4311
+    - title: "Gradle: overview"
+      theory_id: 5075
+    - title: Basic project with Gradle
+      theory_id: 5077
+    - title: Building apps using Gradle
+      theory_id: 7917
+    - title: Gradle build configuration
+      theory_id: 35988
+    - title: "Dependency management: repositories"
+      theory_id: 37189
+    - title: Properties of basic types
+      theory_id: 4455
+    - title: Type conversion
+      theory_id: 4672
+    - title: Reading data with readln
+      theory_id: 11224
+    - title: "When different types meet: type coercion"
+      theory_id: 9506
+    - title: Integers in action
+      theory_id: 4488
+    - title: Comparing numbers. Relational operators
+      theory_id: 4525
+    - title: Declaring functions
+      theory_id: 4580
+    - title: If expression
+      theory_id: 4625
+    - title: Errors in programs
+      theory_id: 11559
+    - title: "Loops: repeat statement"
+      theory_id: 4643
+    - title: Objects and their properties
+      theory_id: 11233
+    - title: Structural vs referential equality
+      theory_id: 11236
+    - title: Work with MutableLists
+      theory_id: 14902
+    - title: Functions as objects
+      theory_id: 5991
+    - title: Lambda expressions
+      theory_id: 30148
+    - title: Unicode
+      theory_id: 7899
+    - title: Characters. Char type
+      theory_id: 4680
+    - title: Ranges
+      theory_id: 4633
+    - title: When expression
+      theory_id: 4631
+    - title: Functional decomposition
+      theory_id: 12668
+    - title: Default arguments
+      theory_id: 4637
+    - title: Named arguments
+      theory_id: 4640
+    - title: Working with strings
+      theory_id: 12561
+    - title: Introduction to collections
+      theory_id: 10390
+    - title: List
+      theory_id: 10730
+    - title: For loop and ranges
+      theory_id: 4652
+    - title: For loop and lists
+      theory_id: 15022
+    - title: External resources
+      theory_id: 6216
+    - title: Web development
+      theory_id: 13931
+    - title: Libraries
+      theory_id: 8504
+    - title: Frameworks
+      theory_id: 6701
+    - title: Introduction to software architecture
+      theory_id: 15368
+    - title: YAML
+      theory_id: 12722
+    - title: Files
+      theory_id: 13025
+    - title: Reading files
+      theory_id: 6351
+    - title: Writing files
+      theory_id: 9710
+    - title: File hierarchies
+      theory_id: 15171
+    - title: Works With File Hierarchies
+      theory_id: 38271
+    - title: JSON
+      theory_id: 6854
+    - title: Introduction to API
+      theory_id: 17007
+    - title: Getting data from REST
+      theory_id: 13287
+    - title: Posting and deleting data via REST
+      theory_id: 13292
+    - title: Handling requests with bodies
+      theory_id: 13334
+    - title: POST vs. PUT requests
+      theory_id: 27497
+    - title: Customizing REST responses
+      theory_id: 33247
+    - title: Serving files
+      theory_id: 37317
+    - title: Response bodies
+      theory_id: 36523
+    - title: Exception
+      theory_id: 7243
+    - title: Hierarchy of exceptions
+      theory_id: 13264
+    - title: Taming exceptions
+      theory_id: 7601
+    - title: Try-catch statement
+      theory_id: 10622
+    - title: The try-catch-finally statement
+      theory_id: 11809
+    - title: Try-with-resources
+      theory_id: 25231
+    - title: MVC
+      theory_id: 17197
+  2:
+    - title: Hexadecimal numbers
+      theory_id: 8788
+    - title: Units of information
+      theory_id: 6865
+    - title: Introduction to Spring Data
+      theory_id: 16299
+    - title: Intro to H2 database
+      theory_id: 27725
+    - title: Relational databases with Spring Data
+      theory_id: 18086
+    - title: UUID
+      theory_id: 31404
+    - title: What is object-oriented programming
+      theory_id: 3614
+    - title: What are databases
+      theory_id: 8497
+    - title: "SQL: structured query language"
+      theory_id: 7054
+    - title: Relational Data Model
+      theory_id: 13785
+    - title: XML
+      theory_id: 6901
+    - title: Data and object mapping
+      theory_id: 8262
+    - title: Object-Relational Mapping (ORM)
+      theory_id: 8312
+    - title: Introduction to JPA
+      theory_id: 17125
+    - title: Intro to MySQL
+      theory_id: 16662
+    - title: Introduction to PostgreSQL
+      theory_id: 17974
+    - title: Entities
+      theory_id: 18135
+  3:
+    - title: Bitwise and bit-shift operations
+      theory_id: 14438
+  4:
+    - title: Libraries overview
+      theory_id: 33986
+    - title: Hashing and security
+      theory_id: 36628

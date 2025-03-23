@@ -1,0 +1,33 @@
+<div class="step-text">
+<h5 id="description">Description</h5>
+<p>The application currently allows users to upload files and track statistics, but users have requested the ability also to download files when needed.</p>
+<p>Create the <code class="language-json">GET /api/v1/download/{filename}</code> endpoint to access uploaded files. If the specified filename exists in the uploads directory, the endpoint should respond with the status code <code class="language-json">200 OK</code> and a response body containing the file as a byte array. If no file exists with the specified filename, the endpoint should respond with the status code <code class="language-json">404 NOT FOUND</code>.</p>
+<p>You should also inform clients how they can access the files they upload. A good way for it is to add the <code class="language-json">Location</code> header to the response of the <code class="language-json">POST /api/v1/upload</code> endpoint. The header's value should be a URL combined with the file download endpoint and the original file name. For example, if a client uploads a file named <em>file.txt</em>, the <code class="language-json">Location</code> header on a local machine would have the value of <em>http://localhost:8888/api/v1/download/file.txt</em>.</p>
+<p>The other functionality should remain the same.</p>
+<h5 id="objectives">Objectives</h5>
+<ul>
+<li>Update the <code class="language-json">POST /api/v1/upload</code> endpoint so that now, in addition to the <code class="language-json">201 CREATED</code> status code, it responds with the <code class="language-json">Location</code> header with the URL of the uploaded file. For example, if the client has uploaded the <em>data.zip </em>file, the header will be as follows:
+
+    <pre><code class="language-no-highlight">Location: http://localhost:8888/api/v1/download/data.zip</code></pre>
+</li>
+<li>Filenames of the uploaded files can have symbols not allowed to be part of a URL, for example, blank spaces. To keep the uploaded file URL valid, you should ensure it is properly encoded. For this purpose, you can use the <code class="language-json">URLEncoder</code> class and its <code class="language-json">encode</code> method.</li>
+<li>Create the <code class="language-json">GET /api/v1/download/{filename}</code> endpoint to allow clients to download any file uploaded to the file server using the file URL provided by the <code class="language-json">POST /api/v1/upload</code> endpoint when the file is uploaded. If the URL is valid, the endpoint should respond with the status code <code class="language-json">200 OK</code> and a response body containing the file as a byte array. If the URL is not resolved, the endpoint should respond with the status code <code class="language-json">404 NOT FOUND</code>.</li>
+<li>Keep in mind that the file URL is URL encoded, but filenames on the disk might be not. To fix it, you might have to decode the filename from the URL using the <code class="language-json">URLDecoder</code> class and its <code class="language-json">decode</code> method.</li>
+</ul>
+<h5 id="examples">Examples</h5>
+<p><strong>Example 1</strong>. <em>POST request to /api/v1/upload with a multipart file named "big file.txt"</em></p>
+<p><em>Response code</em>: <code class="language-json">201 CREATED</code></p>
+<p>Response header: <code class="language-json">Location: http://localhost:8888/api/v1/download/big+file.txt</code></p>
+<p><strong>Example 2</strong>. <em>GET request to /api/v1/info after some files have been uploaded</em></p>
+<p><em>Response code</em>: <code class="language-json">200 OK</code></p>
+<p>Response body:</p>
+<pre><code class="language-json">{
+  "total_files": 3,
+  "total_bytes": 194325
+}</code></pre>
+<p><strong>Example 3</strong>. <em>GET request to /api/v1/download/big+file.txt after the file has been uploaded</em></p>
+<p><em>Response code</em>: <code class="language-json">200 OK</code></p>
+<p>Response body: file content as a byte array</p>
+<p><strong>Example 4</strong>. <em>GET request to /api/v1/download/big file.txt with a non-existing URL</em></p>
+<p><em>Response code</em>: <code class="language-json">404 NOT FOUND</code></p>
+</div>

@@ -1,0 +1,14 @@
+type: hyperskill
+title: File Share (Kotlin)
+language: English
+summary: "<p>Are you curious about how shared storage works when you share files?\
+  \ Have you ever considered building your file-sharing server for personal use or\
+  \ fun? If that's the case, this project that utilizes Spring Boot's capabilities\
+  \ for sending and receiving files is an excellent way to start your exciting journey\
+  \ into file-sharing services.</p><br/><br/>Learn more at <a href=\"https://hyperskill.org/projects/415?utm_source=ide&utm_medium=ide&utm_campaign=ide&utm_content=project-card\"\
+  >https://hyperskill.org/projects/415</a>"
+programming_language: Kotlin
+content:
+  - File Share (Kotlin)
+mode: Study
+yaml_version: 2

@@ -1,0 +1,67 @@
+<div class="step-text">
+<h5 id="description">Description</h5>
+<p>The application is functional, but users have reported a nasty bug. If Alice uploads a file named <em>cat.jpg</em> to the service and Bob uploads a different file with the same name, Alice will receive Bob's file instead of hers. It seems that the service is overwriting old files with new ones that have the same names. This issue needs to be fixed as soon as possible.</p>
+<p>First, we must decouple the original file names from their names in the uploads directory. We can save each uploaded file under a unique name on disk and remember its original name, as well as media type. We can use UUID or any other approach to generate unique file names.</p>
+<p>We should change the method of creating file URLs to be sent to the clients. From now on, each such URL should be unique to avoid name collisions.</p>
+<p>We should keep all information about each file in a database, including its identifier, its name on disk, and its original name. Finally, we should be able to identify which file the service should fetch by the file URL requested by a client and send the requested file to the client, making sure that the correct original name and media type are set in the response headers.</p>
+<p>You can read both the original file name and its media type from the upload request.</p>
+<p>Use the <code class="language-json">Content-Type</code> and <code class="language-json">Content-Disposition</code> headers to specify the original file name and media type in the response:</p>
+<pre><code class="language-no-highlight">Content-Type: image/jpeg
+Content-Disposition: attachment; filename=cat.jpg</code></pre>
+<p>Add the Spring Data JPA starter and the H2 database dependency to the <code class="language-json">build.gradle</code> file:</p>
+<pre><code class="language-no-highlight">dependencies {
+    // other starters
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.h2database:h2'
+}</code></pre>
+<p>Update the <code class="language-json">application.properties</code> file to configure the database and Spring Data JPA:</p>
+<pre><code class="language-no-highlight">server.port=8888
+
+management.endpoints.web.exposure.include=*
+management.endpoint.shutdown.enabled=true
+
+spring.datasource.url=jdbc:h2:file:../fileshare_db
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=sa
+
+spring.jpa.hibernate.ddl-auto=update
+
+uploads.dir=../uploads
+</code></pre>
+<p>The other functionality should remain the same.</p>
+<h5 id="objectives">Objectives</h5>
+<ul>
+<li>Add and set up the <code class="language-json">H2</code> database and Spring Data JPA to the project.</li>
+<li>Modify the service so that it resolves name conflicts and saves all files under unique filenames in the uploads folder.</li>
+<li>For each uploaded file, generate a unique URL, using which the client can access the uploaded file, for example:
+    <pre><code class="language-no-highlight">http://localhost:8888/api/v1/download/324</code></pre>
+</li>
+<li>Keep track of original filenames and media types of all uploaded files. When a client requests a file by sending a request to the <code class="language-json">GET /api/v1/download/{id}</code>endpoint, the service should respond with the status code <code class="language-json">200 OK</code>, a response body containing the requested file as a byte array, and the <code class="language-json">Content-Type</code> and <code class="language-json">Content-Disposition</code> headers, for example:
+    <pre><code class="language-no-highlight">Content-Type: image/jpeg
+Content-Disposition: attachment; filename=cat.jpg</code></pre>
+</li>
+<li>If no file can be found by the requested URL, the <code class="language-json">GET /api/v1/download/{id}</code> endpoint should respond with the status code <code class="language-json">404 NOT FOUND</code>.</li>
+<li>If the file URL contains only valid URL symbols, there is no need to use <code class="language-json">URLEncoder</code> and <code class="language-json">URLDecoder</code> classes to encode and decode filenames.</li>
+</ul>
+<h5 id="examples">Examples</h5>
+<p><strong>Example 1</strong>. <em>POST request to /api/v1/upload with a multipart file named "big file.txt"</em></p>
+<p><em>Response code</em>: <code class="language-json">201 CREATED</code></p>
+<p>Response header: <code class="language-json">Location: http://localhost:8888/api/v1/download/12</code></p>
+<p><strong>Example 2</strong>. <em>GET request to /api/v1/info after some files have been uploaded</em></p>
+<p><em>Response code</em>: <code class="language-json">200 OK</code></p>
+<p>Response body:</p>
+<pre><code class="language-json">{
+  "total_files": 3,
+  "total_bytes": 194325
+}</code></pre>
+<p><strong>Example 3</strong>. <em>GET request to /api/v1/download/12 after the file has been uploaded</em></p>
+<p><em>Response code</em>: <code class="language-json">200 OK</code></p>
+<p><em>Response headers</em>:</p>
+<pre><code class="language-no-highlight">Content-Type: text/plain
+Content-Disposition: attachment; filename="big file.txt"</code></pre>
+<p>Response body: file content as a byte array</p>
+<p><strong>Example 4</strong>. <em>GET request to /api/v1/download/abcde125</em></p>
+<p><em>Response code</em>: <code class="language-json">404 NOT FOUND</code></p>
+</div>
