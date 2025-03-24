@@ -21,6 +21,10 @@ public class FileShareTest extends SpringTest {
     private final String infoUrl = "/api/v1/info";
     private final Path storagePath = Path.of("../uploads");
 
+    public FileShareTest() {
+        super(8888, "../fileshare_db.mv.db");
+    }
+
     CheckResult emptyStorageAndCheckInfo() {
         clearStorage();
 
@@ -93,27 +97,29 @@ public class FileShareTest extends SpringTest {
                 return CheckResult.wrong("The value of the 'Location' header should not be blank");
             }
 
-            var sanitizedLink = location
-                    .replaceAll(".*/", "")
-                    .replaceAll("\\W", "");
-
-            if (!sanitizedLink.matches(fileData.getOriginalName().replaceAll("\\W", ""))) {
-                return CheckResult.wrong("""
-                        The 'Location' value does not look like containing a link to the uploaded file:
-                        Location: %s
-                        Uploaded file name: %s
-                        \r
-                        """.formatted(location, fileData.getOriginalName()));
-            }
-
             HttpResponse<byte[]> getResponse = client.get(location);
 
-            checkStatusCode(
-                    getResponse.request().method(),
-                    getResponse.request().uri().toString(),
-                    getResponse.statusCode(),
-                    200
-            );
+            String contentType = getResponse.headers()
+                    .firstValue("Content-Type")
+                    .orElseThrow(() -> new WrongAnswer("Response should contain the 'Content-Type' header."));
+
+            if (!contentType.matches(fileData.getMimeType())) {
+                return CheckResult.wrong(
+                        "Expected Content-Type: %s but was %s"
+                                .formatted(fileData.getMimeType(), contentType)
+                );
+            }
+
+            String contentDisposition = getResponse.headers()
+                    .firstValue("Content-Disposition")
+                    .orElseThrow(() -> new WrongAnswer("Response should contain the 'Content-Disposition' header."));
+
+            if (!contentDisposition.matches("attachment; filename=\"?%s\"?".formatted(fileData.getOriginalName()))) {
+                return CheckResult.wrong(
+                        "Expected Content-Disposition: attachment; filename=%s but was %s"
+                                .formatted(fileData.getOriginalName(), contentDisposition)
+                );
+            }
 
             if (!Arrays.equals(fileData.getContents(), getResponse.body())) {
                 return CheckResult.wrong("""
@@ -133,12 +139,12 @@ public class FileShareTest extends SpringTest {
             this::emptyStorageAndCheckInfo,
             () -> testPostAndGetFile("./test/files/file 1.jpg", "file 1.jpg"),
             () -> testPostAndGetFile("./test/files/file2.jpg", "file 1.jpg"),
+            () -> testPostAndGetFile("./test/files/file2.jpg", "file 1.jpg"),
             () -> testPostAndGetFile("./test/files/file3.txt", "file3.txt"),
             this::testNotFound,
-            () -> testInfo(2, 32992),
+            () -> testInfo(4, 110462),
             this::reloadServer,
-            () -> testInfo(2, 32992),
-            this::emptyStorageAndCheckInfo,
+            () -> testInfo(4, 110462),
     };
 
     private void checkStatusCode(String method, String endpoint, int actual, int expected) {
