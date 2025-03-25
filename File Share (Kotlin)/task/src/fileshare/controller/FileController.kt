@@ -1,8 +1,10 @@
 package fileshare.controller
 
 import fileshare.model.UpdatedFilesInfo
+import fileshare.service.FileService
 import org.springframework.core.env.Environment
 import org.springframework.core.io.PathResource
+import org.springframework.http.ContentDisposition
 import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -12,35 +14,23 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.io.File
 import java.net.URI
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.nio.file.Path
-import kotlin.io.path.notExists
 
 @RestController
-class UploadRestController(env: Environment) {
-
+class FileController(
+    private val service: FileService,
+    env: Environment,
+) {
     private val uploadDirPath = env.getRequiredProperty("uploads.dir")
-    private val uploadDir = File(uploadDirPath).apply { mkdirs() }
 
     @PostMapping("/api/v1/upload")
     fun uploadFile(@RequestParam file: MultipartFile): ResponseEntity<Unit> {
-        val originalFilename = file
-            .originalFilename?.trim()
-            ?: return ResponseEntity.badRequest().build()
-
-        val safeFilename = URLEncoder.encode(
-            originalFilename,
-            StandardCharsets.UTF_8
-        )
-
-        val path = Path.of(uploadDirPath, safeFilename)
-        file.transferTo(path)
+        val savedFile = service.save(file)
 
         val downloadUri = ServletUriComponentsBuilder
             .fromCurrentContextPath()
             .path("/api/v1/download/")
-            .path(safeFilename)
+            .path(savedFile.id)
             .toUriString()
 
         return ResponseEntity
@@ -50,11 +40,11 @@ class UploadRestController(env: Environment) {
 
     @GetMapping("/api/v1/info")
     fun getUpdatedFilesInfo(): ResponseEntity<UpdatedFilesInfo> {
-        val files = uploadDir.listFiles()?.filter { it.isFile } ?: emptyList()
+        val savedFiles = service.findFiles()
 
         val updatedFilesInfo = UpdatedFilesInfo(
-            totalFiles = files.size,
-            totalBytes = files.sumOf { it.length() }
+            totalFiles = savedFiles.size,
+            totalBytes = savedFiles.sumOf(File::length)
         )
 
         return ResponseEntity.ok(updatedFilesInfo)
@@ -62,20 +52,20 @@ class UploadRestController(env: Environment) {
 
     @GetMapping("/api/v1/download/{fileName}")
     fun downloadFile(@PathVariable fileName: String): ResponseEntity<StreamingResponseBody> {
-        val path = Path.of(uploadDirPath, fileName)
-        if (path.notExists()) {
+        val savedFile = service.findFileById(fileName) ?: run {
             return ResponseEntity.notFound().build()
         }
 
+        val path = Path.of(uploadDirPath, "${savedFile.id}.${savedFile.extension}")
         val resource = PathResource(path)
         val responseBody = StreamingResponseBody { outputStream ->
             resource.inputStream.copyTo(outputStream)
         }
 
         val headers = HttpHeaders().apply {
-            contentType = MediaType.APPLICATION_OCTET_STREAM
+            contentType = MediaType.parseMediaType(savedFile.contentType)
             contentLength = resource.contentLength()
-            setContentDispositionFormData("attachment", resource.filename)
+            contentDisposition = ContentDisposition.attachment().filename(savedFile.name).build()
         }
 
         return ResponseEntity
