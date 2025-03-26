@@ -74,6 +74,27 @@ public class FileShareTest extends SpringTest {
         }
     }
 
+    @DynamicTest
+    DynamicTesting[] dt = {
+            this::emptyStorageAndCheckInfo,
+            () -> testPayloadTooLarge("./test/files/bigfile.png", "file1.png"),
+            () -> testUnsupportedMediaType("./test/files/file3.txt", "file.exe", "application/octet-stream"),
+            () -> testUnsupportedMediaType("./test/files/file2.jpg", "file.jpg", "text/plain"),
+            () -> testUnsupportedMediaType("./test/files/file2.jpg", "file.jpg", "image/png"),
+            () -> testPostAndGetFile("./test/files/file 1.jpg", "file1.jpg"),
+            () -> testPostAndGetFile("./test/files/file2.jpg", "file1.jpg"),
+            () -> testPostAndGetFile("./test/files/file2.jpg", "file1.jpg"),
+            () -> testPostAndGetFile("./test/files/file3.txt", "file.txt"),
+            () -> testPostAndGetFile("./test/files/file4.png", "file.png"),
+            () -> testPostAndGetFile("./test/files/file4.png", "file2.png"),
+            this::testNotFound,
+            () -> testInfo(6, 193942),
+            this::reloadServer,
+            () -> testInfo(6, 193942),
+            () -> testPayloadTooLarge("./test/files/file2.jpg", "file3.jpg"),
+            () -> testInfo(6, 193942),
+    };
+
     CheckResult testPostAndGetFile(String filepath, String filename) {
         try {
             FileClient client = new FileClient();
@@ -134,18 +155,47 @@ public class FileShareTest extends SpringTest {
         }
     }
 
-    @DynamicTest
-    DynamicTesting[] dt = {
-            this::emptyStorageAndCheckInfo,
-            () -> testPostAndGetFile("./test/files/file 1.jpg", "file 1.jpg"),
-            () -> testPostAndGetFile("./test/files/file2.jpg", "file 1.jpg"),
-            () -> testPostAndGetFile("./test/files/file2.jpg", "file 1.jpg"),
-            () -> testPostAndGetFile("./test/files/file3.txt", "file3.txt"),
-            this::testNotFound,
-            () -> testInfo(4, 110462),
-            this::reloadServer,
-            () -> testInfo(4, 110462),
-    };
+    CheckResult testPayloadTooLarge(String filepath, String filename) {
+        try {
+            FileClient client = new FileClient();
+
+            FileData fileData = FileData.of(filepath).setOriginalName(filename);
+
+            HttpResponse<byte[]> postResponse = client.post(uploadUrl, fileData);
+
+            checkStatusCode(
+                    postResponse.request().method(),
+                    postResponse.request().uri().toString(),
+                    postResponse.statusCode(),
+                    413
+            );
+
+            return CheckResult.correct();
+        } catch (IOException | InterruptedException e) {
+            return CheckResult.wrong("Error occurred during the test execution: " + e.getMessage());
+        }
+    }
+
+    CheckResult testUnsupportedMediaType(String filepath, String filename, String mediaType) {
+        try {
+            FileClient client = new FileClient();
+
+            FileData fileData = FileData.of(filepath).setOriginalName(filename).setMimeType(mediaType);
+
+            HttpResponse<byte[]> postResponse = client.post(uploadUrl, fileData);
+
+            checkStatusCode(
+                    postResponse.request().method(),
+                    postResponse.request().uri().toString(),
+                    postResponse.statusCode(),
+                    415
+            );
+
+            return CheckResult.correct();
+        } catch (IOException | InterruptedException e) {
+            return CheckResult.wrong("Error occurred during the test execution: " + e.getMessage());
+        }
+    }
 
     private void checkStatusCode(String method, String endpoint, int actual, int expected) {
         if (actual != expected) {

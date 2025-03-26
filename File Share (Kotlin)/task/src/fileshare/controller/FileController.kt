@@ -2,12 +2,10 @@ package fileshare.controller
 
 import fileshare.model.UpdatedFilesInfo
 import fileshare.service.FileService
+import fileshare.usecase.FileValidator
 import org.springframework.core.env.Environment
 import org.springframework.core.io.PathResource
-import org.springframework.http.ContentDisposition
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
+import org.springframework.http.*
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
@@ -19,12 +17,23 @@ import java.nio.file.Path
 @RestController
 class FileController(
     private val service: FileService,
+    private val fileValidator: FileValidator,
     env: Environment,
 ) {
     private val uploadDirPath = env.getRequiredProperty("uploads.dir")
 
     @PostMapping("/api/v1/upload")
     fun uploadFile(@RequestParam file: MultipartFile): ResponseEntity<Unit> {
+        val remainingAvailableSpace = STORAGE_LIMIT - service.findFiles().sumOf(File::length)
+        if (file.size > remainingAvailableSpace || file.size > FILE_LIMIT) {
+            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build()
+        }
+
+        val isValid = fileValidator.isValidFile(file.contentType.orEmpty(), file.bytes)
+        if (isValid != null) {
+            return isValid
+        }
+
         val savedFile = service.save(file)
 
         val downloadUri = ServletUriComponentsBuilder
@@ -72,5 +81,10 @@ class FileController(
             .ok()
             .headers(headers)
             .body(responseBody)
+    }
+
+    companion object {
+        private const val STORAGE_LIMIT = 200 shl 10 // 200 KB
+        private const val FILE_LIMIT = 50 shl 10 // 50 KB
     }
 }
