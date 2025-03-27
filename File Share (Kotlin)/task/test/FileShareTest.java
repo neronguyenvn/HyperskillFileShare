@@ -74,27 +74,6 @@ public class FileShareTest extends SpringTest {
         }
     }
 
-    @DynamicTest
-    DynamicTesting[] dt = {
-            this::emptyStorageAndCheckInfo,
-            () -> testPayloadTooLarge("./test/files/bigfile.png", "file1.png"),
-            () -> testUnsupportedMediaType("./test/files/file3.txt", "file.exe", "application/octet-stream"),
-            () -> testUnsupportedMediaType("./test/files/file2.jpg", "file.jpg", "text/plain"),
-            () -> testUnsupportedMediaType("./test/files/file2.jpg", "file.jpg", "image/png"),
-            () -> testPostAndGetFile("./test/files/file 1.jpg", "file1.jpg"),
-            () -> testPostAndGetFile("./test/files/file2.jpg", "file1.jpg"),
-            () -> testPostAndGetFile("./test/files/file2.jpg", "file1.jpg"),
-            () -> testPostAndGetFile("./test/files/file3.txt", "file.txt"),
-            () -> testPostAndGetFile("./test/files/file4.png", "file.png"),
-            () -> testPostAndGetFile("./test/files/file4.png", "file2.png"),
-            this::testNotFound,
-            () -> testInfo(6, 193942),
-            this::reloadServer,
-            () -> testInfo(6, 193942),
-            () -> testPayloadTooLarge("./test/files/file2.jpg", "file3.jpg"),
-            () -> testInfo(6, 193942),
-    };
-
     CheckResult testPostAndGetFile(String filepath, String filename) {
         try {
             FileClient client = new FileClient();
@@ -196,6 +175,31 @@ public class FileShareTest extends SpringTest {
             return CheckResult.wrong("Error occurred during the test execution: " + e.getMessage());
         }
     }
+
+    @DynamicTest
+    DynamicTesting[] dt = {
+            this::emptyStorageAndCheckInfo,
+            () -> testPayloadTooLarge("./test/files/bigfile.png", "file1.png"),
+            () -> testUnsupportedMediaType("./test/files/file2.jpg", "file.exe", "application/octet-stream"),
+            () -> testUnsupportedMediaType("./test/files/file2.jpg", "file.jpg", "text/plain"),
+            () -> testUnsupportedMediaType("./test/files/file2.jpg", "file.jpg", "image/png"),
+            () -> testPostAndGetFile("./test/files/file 1.jpg", "file1.jpg"),
+            () -> testPostAndGetFile("./test/files/file 1.jpg", "file1.jpg"),
+            () -> testPostAndGetFile("./test/files/file 1.jpg", "file1.jpg"),
+            () -> testInfo(1, 44856),
+            () -> testPostAndGetFile("./test/files/file2.jpg", "file1.jpg"),
+            () -> testPostAndGetFile("./test/files/file3.txt", "file.txt"),
+            () -> testPostAndGetFile("./test/files/file4.png", "file.png"),
+            () -> testPostAndGetFile("./test/files/file5.jpg", "file33.jpg"),
+            () -> testInfo(5, 161541),
+            () -> testPostAndGetFile("./test/files/file4.png", "file44.png"),
+            () -> testPostAndGetFile("./test/files/file5.jpg", "file55.jpg"),
+            this::testNotFound,
+            this::reloadServer,
+            () -> testInfo(5, 161541),
+            () -> testPayloadTooLarge("./test/files/file6.jpg", "file.jpg"),
+            () -> testInfo(5, 161541),
+    };
 
     private void checkStatusCode(String method, String endpoint, int actual, int expected) {
         if (actual != expected) {

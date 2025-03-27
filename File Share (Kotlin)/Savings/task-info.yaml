@@ -1,8 +1,5 @@
 type: edu
 files:
-  - name: src/fileshare/web/UploadRestController.kt
-    visible: true
-    learner_created: false
   - name: src/fileshare/Application.kt
     visible: true
     learner_created: false
@@ -51,6 +48,21 @@ files:
   - name: test/FileShareTest.java
     visible: false
     learner_created: false
+  - name: src/fileshare/service/FileService.kt
+    visible: true
+    learner_created: true
+  - name: src/fileshare/repository/FileRepository.kt
+    visible: true
+    learner_created: true
+  - name: src/fileshare/model/UploadedFile.kt
+    visible: true
+    learner_created: true
+  - name: src/fileshare/usecase/FileValidator.kt
+    visible: true
+    learner_created: true
+  - name: src/fileshare/controller/FileController.kt
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/39862#comment
 status: Unchecked
 record: -1
