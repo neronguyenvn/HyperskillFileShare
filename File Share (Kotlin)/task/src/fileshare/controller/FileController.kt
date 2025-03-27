@@ -2,7 +2,6 @@ package fileshare.controller
 
 import fileshare.model.UpdatedFilesInfo
 import fileshare.service.FileService
-import fileshare.usecase.FileValidator
 import org.springframework.core.env.Environment
 import org.springframework.core.io.PathResource
 import org.springframework.http.*
@@ -17,25 +16,25 @@ import java.nio.file.Path
 @RestController
 class FileController(
     private val service: FileService,
-    private val fileValidator: FileValidator,
     env: Environment,
 ) {
     private val uploadDirPath = env.getRequiredProperty("uploads.dir")
 
     @PostMapping("/api/v1/upload")
     fun uploadFile(@RequestParam file: MultipartFile): ResponseEntity<Unit> {
-        val remainingAvailableSpace = STORAGE_LIMIT - service.findFiles().sumOf(File::length)
-        if (file.size > remainingAvailableSpace || file.size > FILE_LIMIT) {
-            return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build()
+        val result = runCatching {
+            service.save(file)
+        }.onFailure { e ->
+            return ResponseEntity(
+                when (e) {
+                    is FileService.InvalidFileType -> HttpStatus.UNSUPPORTED_MEDIA_TYPE
+                    is FileService.InvalidFileSize -> HttpStatus.PAYLOAD_TOO_LARGE
+                    else -> HttpStatus.BAD_REQUEST
+                }
+            )
         }
 
-        val isValid = fileValidator.isValidFile(file.contentType.orEmpty(), file.bytes)
-        if (isValid != null) {
-            return isValid
-        }
-
-        val savedFile = service.save(file)
-
+        val savedFile = result.getOrThrow()
         val downloadUri = ServletUriComponentsBuilder
             .fromCurrentContextPath()
             .path("/api/v1/download/")
@@ -81,10 +80,5 @@ class FileController(
             .ok()
             .headers(headers)
             .body(responseBody)
-    }
-
-    companion object {
-        private const val STORAGE_LIMIT = 200 shl 10 // 200 KB
-        private const val FILE_LIMIT = 50 shl 10 // 50 KB
     }
 }

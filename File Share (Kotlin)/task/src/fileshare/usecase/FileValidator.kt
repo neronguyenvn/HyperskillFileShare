@@ -1,7 +1,5 @@
 package fileshare.usecase
 
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Component
 import java.nio.ByteBuffer
 import java.nio.charset.StandardCharsets
@@ -9,20 +7,17 @@ import java.nio.charset.StandardCharsets
 @Component
 class FileValidator {
 
-    fun isValidFile(mediaType: String, fileBytes: ByteArray): ResponseEntity<Unit>? {
+    fun isValidFile(mediaType: String, fileBytes: ByteArray): Boolean {
         if (mediaType !in allowedMediaTypes) {
-            return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build()
+            return false
         }
 
-        val isValid = when (mediaType) {
+        return when (mediaType) {
             "image/png" -> checkPngSignature(fileBytes)
             "image/jpeg" -> checkJpegSignature(fileBytes)
             "text/plain" -> isValidUtf8(fileBytes)
-            else -> return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build()
+            else -> false
         }
-
-        return if (isValid) null
-        else ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build()
     }
 
     private fun checkPngSignature(bytes: ByteArray): Boolean {
