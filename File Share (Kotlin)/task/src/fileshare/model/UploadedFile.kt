@@ -14,4 +14,6 @@ data class UploadedFile(
     val extension: String,
 
     val contentType: String,
+
+    val downloadUri: String
 )
