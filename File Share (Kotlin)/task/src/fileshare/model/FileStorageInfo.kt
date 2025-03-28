@@ -4,7 +4,7 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Id
 
 @Entity
-data class UploadedFile(
+data class FileStorageInfo(
 
     @Id
     val id: String,

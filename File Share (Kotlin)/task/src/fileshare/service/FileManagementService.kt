@@ -1,8 +1,8 @@
 package fileshare.service
 
 import fileshare.md5
+import fileshare.model.FileStorageInfo
 import fileshare.model.UpdatedFilesInfo
-import fileshare.model.UploadedFile
 import fileshare.repository.FileRepository
 import fileshare.usecase.FileValidator
 import org.slf4j.LoggerFactory
@@ -19,10 +19,11 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import java.io.File
 import kotlin.io.path.exists
 
 @Service
-class FileService(
+class FileManagementService(
     private val repository: FileRepository,
     private val fileStorageService: FileStorageService,
     private val fileValidator: FileValidator,
@@ -30,11 +31,11 @@ class FileService(
     @Value("\${api.base-path}")
     private lateinit var basePath: String
 
-    private val logger = LoggerFactory.getLogger(FileService::class.java)
+    private val logger = LoggerFactory.getLogger(FileManagementService::class.java)
 
-    fun save(file: MultipartFile): UploadedFile {
+    fun save(file: MultipartFile): FileStorageInfo {
         val originalFilename = StringUtils.cleanPath(file.originalFilename.orEmpty())
-        val fileExtension = originalFilename.substringAfterLast('.')
+        val fileExtension = File(originalFilename).extension.lowercase()
         val fileMd5 = file.bytes.md5()
 
         repository.findByIdOrNull(fileMd5)?.let { existingFile ->
@@ -51,7 +52,7 @@ class FileService(
             .toUriString()
 
         val savedFile = repository.save(
-            UploadedFile(
+            FileStorageInfo(
                 id = fileMd5,
                 name = originalFilename,
                 extension = fileExtension,
@@ -87,20 +88,18 @@ class FileService(
         }
     }
 
-    private fun findFileById(id: String): UploadedFile? {
+    private fun findFileById(id: String): FileStorageInfo? {
         val savedFile = repository.findByIdOrNull(id) ?: return null
         val filePath = fileStorageService.getStoredFilePath(savedFile)
 
-        if (!filePath.exists()) {
+        return savedFile.takeIf { filePath.exists() } ?: run {
             logger.warn("File metadata exists but file is missing: $filePath")
-            return null
+            null
         }
-
-        return savedFile
     }
 
     private fun isFileValid(file: MultipartFile): Boolean {
-        return fileValidator.isValidFile(file.contentType.orEmpty(), file.bytes)
+        return fileValidator.validate(file.contentType.orEmpty(), file.bytes)
     }
 
     private fun hasEnoughSpace(fileSize: Long): Boolean {

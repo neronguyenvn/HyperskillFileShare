@@ -1,7 +1,7 @@
 package fileshare.controller
 
 import fileshare.model.UpdatedFilesInfo
-import fileshare.service.FileService
+import fileshare.service.FileManagementService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -10,7 +10,7 @@ import java.net.URI
 
 @RestController
 @RequestMapping("\${api.base-path}")
-class FileController(private val service: FileService) {
+class FileController(private val service: FileManagementService) {
 
     @PostMapping("/upload")
     fun uploadFile(@RequestParam file: MultipartFile): ResponseEntity<Unit> {

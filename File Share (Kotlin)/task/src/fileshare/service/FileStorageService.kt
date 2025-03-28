@@ -1,7 +1,7 @@
 package fileshare.service
 
+import fileshare.model.FileStorageInfo
 import fileshare.model.UpdatedFilesInfo
-import fileshare.model.UploadedFile
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -23,7 +23,7 @@ class FileStorageService {
         }
     }
 
-    fun storeFile(multipartFile: MultipartFile, uploadedFile: UploadedFile) {
+    fun storeFile(multipartFile: MultipartFile, uploadedFile: FileStorageInfo) {
         multipartFile.transferTo(getStoredFilePath(uploadedFile))
     }
 
@@ -35,15 +35,15 @@ class FileStorageService {
         )
     }
 
-    fun fileExists(file: UploadedFile): Boolean {
+    fun fileExists(file: FileStorageInfo): Boolean {
         return getStoredFilePath(file).exists()
     }
 
-    fun getStoredFilePath(file: UploadedFile): Path {
+    fun getStoredFilePath(file: FileStorageInfo): Path {
         return Path.of(uploadDirPath, "${file.id}d.${file.extension}")
     }
 
     fun getUsedStorage(): Long {
-        return uploadDir.walk().sumOf { it.length() }
+        return uploadDir.walk().filter(File::isFile).sumOf(File::length)
     }
 }

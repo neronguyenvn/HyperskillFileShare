@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets
 @Component
 class FileValidator {
 
-    fun isValidFile(mediaType: String, fileBytes: ByteArray): Boolean {
+    fun validate(mediaType: String, fileBytes: ByteArray): Boolean {
         if (mediaType !in allowedMediaTypes) {
             return false
         }

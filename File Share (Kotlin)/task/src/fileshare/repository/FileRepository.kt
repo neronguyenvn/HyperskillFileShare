@@ -1,6 +1,6 @@
 package fileshare.repository
 
-import fileshare.model.UploadedFile
+import fileshare.model.FileStorageInfo
 import org.springframework.data.repository.CrudRepository
 
-interface FileRepository : CrudRepository<UploadedFile, String>
+interface FileRepository : CrudRepository<FileStorageInfo, String>

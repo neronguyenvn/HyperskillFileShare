@@ -48,13 +48,13 @@ files:
   - name: test/FileShareTest.java
     visible: false
     learner_created: false
-  - name: src/fileshare/service/FileService.kt
+  - name: src/fileshare/service/FileManagementService.kt
     visible: true
     learner_created: true
   - name: src/fileshare/repository/FileRepository.kt
     visible: true
     learner_created: true
-  - name: src/fileshare/model/UploadedFile.kt
+  - name: src/fileshare/model/FileStorageInfo.kt
     visible: true
     learner_created: true
   - name: src/fileshare/usecase/FileValidator.kt
@@ -74,5 +74,5 @@ status: Solved
 feedback:
   message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">Hyperskill</a>
     to continue learning.
-  time: "Fri, 28 Mar 2025 17:05:15 UTC"
+  time: "Fri, 28 Mar 2025 17:13:58 UTC"
 record: -1
