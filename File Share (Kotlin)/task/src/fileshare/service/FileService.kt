@@ -5,6 +5,7 @@ import fileshare.model.UpdatedFilesInfo
 import fileshare.model.UploadedFile
 import fileshare.repository.FileRepository
 import fileshare.usecase.FileValidator
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.io.PathResource
 import org.springframework.data.repository.findByIdOrNull
@@ -18,22 +19,18 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import java.io.File
-import java.nio.file.Path
 import kotlin.io.path.exists
 
 @Service
 class FileService(
     private val repository: FileRepository,
+    private val fileStorageService: FileStorageService,
     private val fileValidator: FileValidator,
 ) {
     @Value("\${api.base-path}")
     private lateinit var basePath: String
 
-    @Value("\${uploads.dir}")
-    private lateinit var uploadDirPath: String
-
-    private val uploadDir by lazy { File(uploadDirPath).apply { mkdirs() } }
+    private val logger = LoggerFactory.getLogger(FileService::class.java)
 
     fun save(file: MultipartFile): UploadedFile {
         val originalFilename = StringUtils.cleanPath(file.originalFilename.orEmpty())
@@ -63,22 +60,20 @@ class FileService(
             )
         )
 
-        file.transferTo(Path.of(uploadDirPath, "${savedFile.id}.${savedFile.extension}"))
+        fileStorageService.storeFile(file, savedFile)
 
         return savedFile
     }
 
     fun getFilesInfo(): UpdatedFilesInfo {
-        val storedFiles = uploadDir.listFiles()?.filter { it.isFile }.orEmpty()
-        return UpdatedFilesInfo(
-            totalFiles = storedFiles.size,
-            totalBytes = storedFiles.sumOf { it.length() }
-        )
+        return fileStorageService.getStoredFilesInfo()
     }
 
     fun downloadFile(fileId: String): Pair<HttpHeaders, StreamingResponseBody>? {
         val savedFile = findFileById(fileId) ?: return null
-        val path = Path.of(uploadDirPath, "${savedFile.id}.${savedFile.extension}")
+        if (!fileStorageService.fileExists(savedFile)) return null
+
+        val path = fileStorageService.getStoredFilePath(savedFile)
 
         val resource = PathResource(path)
         val headers = HttpHeaders().apply {
@@ -94,8 +89,14 @@ class FileService(
 
     private fun findFileById(id: String): UploadedFile? {
         val savedFile = repository.findByIdOrNull(id) ?: return null
-        val filePath = Path.of(uploadDirPath, "${savedFile.id}.${savedFile.extension}")
-        return if (filePath.exists()) savedFile else null
+        val filePath = fileStorageService.getStoredFilePath(savedFile)
+
+        if (!filePath.exists()) {
+            logger.warn("File metadata exists but file is missing: $filePath")
+            return null
+        }
+
+        return savedFile
     }
 
     private fun isFileValid(file: MultipartFile): Boolean {
@@ -103,7 +104,7 @@ class FileService(
     }
 
     private fun hasEnoughSpace(fileSize: Long): Boolean {
-        val usedSpace = uploadDir.listFiles()?.sumOf { it.length() } ?: 0L
+        val usedSpace = fileStorageService.getUsedStorage()
         return fileSize <= STORAGE_LIMIT - usedSpace && fileSize <= FILE_LIMIT
     }
 
