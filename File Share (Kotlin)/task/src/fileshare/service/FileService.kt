@@ -6,15 +6,16 @@ import fileshare.model.UploadedFile
 import fileshare.repository.FileRepository
 import fileshare.usecase.FileValidator
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.env.Environment
 import org.springframework.core.io.PathResource
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.ContentDisposition
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.util.StringUtils
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import java.io.File
@@ -43,8 +44,8 @@ class FileService(
             return existingFile.copy(name = originalFilename).also { repository.save(it) }
         }
 
-        if (!hasEnoughSpace(file.size)) throw InvalidFileSize()
-        if (!isFileValid(file)) throw InvalidFileType()
+        if (!hasEnoughSpace(file.size)) throw ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE)
+        if (!isFileValid(file)) throw ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
 
         val downloadUri = ServletUriComponentsBuilder
             .fromCurrentContextPath()
@@ -105,9 +106,6 @@ class FileService(
         val usedSpace = uploadDir.listFiles()?.sumOf { it.length() } ?: 0L
         return fileSize <= STORAGE_LIMIT - usedSpace && fileSize <= FILE_LIMIT
     }
-
-    class InvalidFileSize : Exception()
-    class InvalidFileType : Exception()
 
     companion object {
         private const val STORAGE_LIMIT = 200 * 1000
