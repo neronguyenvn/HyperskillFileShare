@@ -5,6 +5,7 @@ import fileshare.model.UpdatedFilesInfo
 import fileshare.model.UploadedFile
 import fileshare.repository.FileRepository
 import fileshare.usecase.FileValidator
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.env.Environment
 import org.springframework.core.io.PathResource
 import org.springframework.data.repository.findByIdOrNull
@@ -24,10 +25,14 @@ import kotlin.io.path.exists
 class FileService(
     private val repository: FileRepository,
     private val fileValidator: FileValidator,
-    env: Environment,
 ) {
-    private val uploadDirPath = env.getRequiredProperty("uploads.dir")
-    private val uploadDir = File(uploadDirPath).apply { mkdirs() }
+    @Value("\${api.base-path}")
+    private lateinit var basePath: String
+
+    @Value("\${uploads.dir}")
+    private lateinit var uploadDirPath: String
+
+    private val uploadDir by lazy { File(uploadDirPath).apply { mkdirs() } }
 
     fun save(file: MultipartFile): UploadedFile {
         val originalFilename = StringUtils.cleanPath(file.originalFilename.orEmpty())
@@ -43,7 +48,7 @@ class FileService(
 
         val downloadUri = ServletUriComponentsBuilder
             .fromCurrentContextPath()
-            .path("/api/v1/download/")
+            .path("$basePath/download/")
             .path(fileMd5)
             .toUriString()
 

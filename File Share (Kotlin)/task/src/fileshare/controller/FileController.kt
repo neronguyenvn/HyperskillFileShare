@@ -10,36 +10,37 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.net.URI
 
 @RestController
+@RequestMapping("\${api.base-path}")
 class FileController(private val service: FileService) {
-    @PostMapping("/api/v1/upload")
+
+    @PostMapping("/upload")
     fun uploadFile(@RequestParam file: MultipartFile): ResponseEntity<Unit> {
-        return runCatching { service.save(file) }
-            .fold(
-                onSuccess = { savedFile ->
-                    ResponseEntity.created(URI.create(savedFile.downloadUri)).build()
-                },
-                onFailure = { e ->
-                    ResponseEntity.status(
-                        when (e) {
-                            is FileService.InvalidFileType -> HttpStatus.UNSUPPORTED_MEDIA_TYPE
-                            is FileService.InvalidFileSize -> HttpStatus.PAYLOAD_TOO_LARGE
-                            else -> HttpStatus.BAD_REQUEST
-                        }
-                    ).build()
-                }
-            )
+        val savedFile = service.save(file)
+        return ResponseEntity.created(URI.create(savedFile.downloadUri)).build()
     }
 
-    @GetMapping("/api/v1/info")
-    fun getUpdatedFilesInfo(): ResponseEntity<UpdatedFilesInfo> {
-        val updatedFilesInfo = service.getFilesInfo()
-        return ResponseEntity.ok(updatedFilesInfo)
-    }
+    @GetMapping("/info")
+    fun getUpdatedFilesInfo(): ResponseEntity<UpdatedFilesInfo> =
+        ResponseEntity.ok(service.getFilesInfo())
 
-    @GetMapping("/api/v1/download/{fileId}")
-    fun downloadFile(@PathVariable fileId: String): ResponseEntity<StreamingResponseBody> {
-        return service.downloadFile(fileId)?.let { (headers, body) ->
+    @GetMapping("/download/{fileId}")
+    fun downloadFile(@PathVariable fileId: String): ResponseEntity<StreamingResponseBody> =
+        service.downloadFile(fileId)?.let { (headers, body) ->
             ResponseEntity.ok().headers(headers).body(body)
         } ?: ResponseEntity.notFound().build()
+
+    @ExceptionHandler(FileService.InvalidFileType::class)
+    private fun handleInvalidFileType(): ResponseEntity<Unit> {
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build()
+    }
+
+    @ExceptionHandler(FileService.InvalidFileSize::class)
+    private fun handleInvalidFileSize(): ResponseEntity<Unit> {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).build()
+    }
+
+    @ExceptionHandler(Exception::class)
+    private fun handleOtherErrors(): ResponseEntity<Unit> {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build()
     }
 }
